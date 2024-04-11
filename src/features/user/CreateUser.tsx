@@ -1,30 +1,44 @@
-import { useState } from 'react';
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { updateName } from "./userSlice";
+import Button from "../../UI/Button";
+import { useNavigate } from "react-router-dom";
 
 function CreateUser() {
-  const [username, setUsername] = useState('');
+	const [username, setUsername] = useState("");
+	const dispatch = useDispatch();
+	const navigate = useNavigate();
 
-  function handleSubmit(e) {
-    e.preventDefault();
-  }
+	function handleSubmit(e: HTMLFormElement) {
+		console.log("EVENT", e);
+		e.preventDefault();
 
-  return (
-    <form onSubmit={handleSubmit}>
-      <p>👋 Welcome! Please start by telling us your name:</p>
+		if (!username) return;
+		dispatch(updateName(username));
+		navigate("/menu");
+	}
 
-      <input
-        type="text"
-        placeholder="Your full name"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
+	return (
+		<form onSubmit={() => handleSubmit}>
+			<p className='mb-4 text-sm text-stone-600 md:text-base'>
+				👋 Welcome! Please start by telling us your name:
+			</p>
 
-      {username !== '' && (
-        <div>
-          <button>Start ordering</button>
-        </div>
-      )}
-    </form>
-  );
+			<input
+				type='text'
+				placeholder='Your full name'
+				value={username}
+				onChange={(e) => setUsername(e.target.value)}
+				className='input mb-8 w-72'
+			/>
+
+			{username !== "" && (
+				<div>
+					<Button type='primary' onClick={handleSubmit} >Start ordering</Button>
+				</div>
+			)}
+		</form>
+	);
 }
 
 export default CreateUser;
