@@ -10,7 +10,6 @@ function CreateUser() {
 	const navigate = useNavigate();
 
 	function handleSubmit(e: HTMLFormElement) {
-		console.log("EVENT", e);
 		e.preventDefault();
 
 		if (!username) return;

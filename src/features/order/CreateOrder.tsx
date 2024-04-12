@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // import { useState } from "react";
 // import { Form, redirect, useActionData, useNavigation } from "react-router-dom";
-import { Form, redirect, useActionData } from "react-router-dom";
+import { Form, redirect, useActionData, useNavigation } from "react-router-dom";
 import { createOrder } from "../../services/apiRestaurant";
 import { useSelector } from "react-redux";
+import { getCart } from "../cart/CartSlice";
+import Button from "../../UI/Button";
 
 // https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str: any) =>
@@ -11,40 +13,17 @@ const isValidPhone = (str: any) =>
 		str
 	);
 
-const fakeCart = [
-	{
-		pizzaId: 12,
-		name: "Mediterranean",
-		quantity: 2,
-		unitPrice: 16,
-		totalPrice: 32,
-	},
-	{
-		pizzaId: 6,
-		name: "Vegetale",
-		quantity: 1,
-		unitPrice: 13,
-		totalPrice: 13,
-	},
-	{
-		pizzaId: 11,
-		name: "Spinach and Mushroom",
-		quantity: 1,
-		unitPrice: 15,
-		totalPrice: 15,
-	},
-];
+
 
 function CreateOrder() {
-	// const navigation = useNavigation();
-	// const isSubmitting: boolean = navigation.state === "submitting";
+	const navigation = useNavigation();
+	const isSubmitting: boolean = navigation.state === "submitting";
 	// * For any data
 	const username =  useSelector((state: any) => state.user.username)
 	const formErrors: any = useActionData();
-	console.log(formErrors, "FORM ERRORS");
 
 	// const [withPriority, setWithPriority] = useState(false);
-	const cart = fakeCart;
+	const cart = useSelector(getCart);
 
 	return (
 		<div className='px-4 py-6'>
@@ -97,9 +76,9 @@ function CreateOrder() {
 
 				<div>
 					<input type='hidden' name='cart' value={JSON.stringify(cart)} />
-					{/* <Button disabled={isSubmitting} type='primary'>
+					<Button disabled={isSubmitting} type='primary'>
 						{isSubmitting ? "Placing order...." : "Order now"}
-					</Button> */}
+					</Button>
 				</div>
 			</Form>
 		</div>
@@ -116,16 +95,16 @@ export async function action({ request }: any) {
 		priority: data.priority === "on",
 	};
 	const errors: any = {};
-	console.log(!isValidPhone(order.phone), "REGULAR");
 	if (!isValidPhone(order.phone)) {
 		errors.phone = "Please, provide a valid US number. ";
-		console.log(errors, "AFTER");
 		return errors;
 	}
 	if (Object.keys(errors).length > 1) return errors;
 
 	//   * Form was filled correctly
+	console.log( "CALLING")
 	const newOrder = await createOrder(order);
+	console.log(newOrder, "NUEVA ORDERN")
 	return redirect(`/order/${newOrder.id}`);
 }
 

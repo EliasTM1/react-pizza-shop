@@ -3,12 +3,13 @@ import { Link } from "react-router-dom";
 import { clearCart, getCart } from "./CartSlice";
 import CartItem from "./CartItem";
 import Button from "../../UI/Button";
+import { MenuItemProps } from "../../types/pizza";
 
 function Cart() {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const username = useSelector((state: any) => state.user.username);
 	const dispatch = useDispatch();
-	const cart: any = useSelector(getCart);
+	const cart: MenuItemProps[] = useSelector(getCart);
 
 	return (
 		<div className='px-4 py-3'>

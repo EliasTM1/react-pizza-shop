@@ -36,7 +36,7 @@ const router = createBrowserRouter([
 			},
 
 			{
-				path: "/order/:orderId",
+				path: "/order/:orderID",
 				element: <Order />,
 				errorElement: <Error />,
 				loader: laoder,

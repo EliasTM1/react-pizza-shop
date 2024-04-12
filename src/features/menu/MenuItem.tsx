@@ -1,20 +1,22 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Button from "../../UI/Button";
 import { formatCurrency } from "../../utils/helpers";
-import { addItem } from "../cart/CartSlice";
+import { addItem, getCurrentQtyById } from "../cart/CartSlice";
+import { MenuItemProps } from "../../types/pizza";
+import { DeleteItem } from "../cart/DeleteItem";
+import { UpdateItemQty } from "../cart/UpdateItemQty";
 
-type MenuItemProps = {
-	id: string;
-	name: string;
-	unitPrice: string;
-	ingredients: [];
-	soldOut: string;
-	imageUrl: string;
-};
-
-function MenuItem({ pizza }: any) {
-	const { id, name, unitPrice, ingredients, soldOut, imageUrl } = pizza;
-	const dispatch = useDispatch()
+function MenuItem({
+	id,
+	name,
+	unitPrice,
+	ingredients,
+	soldOut,
+	imageUrl,
+}: MenuItemProps) {
+	const currentQuantity = useSelector(getCurrentQtyById(id));
+	const isInCart = currentQuantity > 0;
+	const dispatch = useDispatch();
 	const handleAddToCart = () => {
 		const newItem = {
 			pizzaID: id,
@@ -23,7 +25,7 @@ function MenuItem({ pizza }: any) {
 			unitPrice,
 			totalPrice: unitPrice * 1,
 		};
-		dispatch(addItem(newItem))
+		dispatch(addItem(newItem));
 	};
 
 	return (
@@ -39,6 +41,12 @@ function MenuItem({ pizza }: any) {
 					{ingredients.join(", ")}
 				</p>
 				<div className='mt-auto flex items-center justify-between'>
+					{isInCart && (
+						<div className='flex items-center gap-3 sm:gap-8'>
+							<UpdateItemQty pizzaId={id} currentQty={currentQuantity} />
+							<DeleteItem pizzaId={id} />
+						</div>
+					)}
 					{!soldOut ? (
 						<p className='text-sm'>{formatCurrency(unitPrice)}</p>
 					) : (
@@ -47,9 +55,13 @@ function MenuItem({ pizza }: any) {
 						</p>
 					)}
 
-					<Button onClick={handleAddToCart} type='small'>
-						Add to cart
-					</Button>
+					{!soldOut && !isInCart && (
+						<div className='flex items-center gap-3 sm:gap-8'>
+							<Button onClick={handleAddToCart} type='small'>
+								Add to cart
+							</Button>
+						</div>
+					)}
 				</div>
 			</div>
 		</li>
