@@ -40,6 +40,7 @@ const router = createBrowserRouter([
 				element: <Order />,
 				errorElement: <Error />,
 				loader: laoder,
+				// action: update,
 			},
 		],
 	},

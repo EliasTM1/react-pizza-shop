@@ -5,8 +5,8 @@ import { DeleteItem } from "./DeleteItem";
 import { UpdateItemQty } from "./UpdateItemQty";
 
 function CartItem({ item }) {
-	const { pizzaID, name, quantity, totalPrice } = item;
-	const currentQty = useSelector(getCurrentQtyById(pizzaID));
+	const { pizzaId, name, quantity, totalPrice } = item;
+	const currentQty = useSelector(getCurrentQtyById(pizzaId));
 
 	return (
 		<li className='py-3 sm:flex sm:items-center sm:justify-between'>
@@ -15,8 +15,8 @@ function CartItem({ item }) {
 			</p>
 			<div className='flex items-center justify-between sm:gap-6'>
 				<p className='text-sm font-bold'>{formatCurrency(totalPrice)}</p>
-				<UpdateItemQty pizzaId={pizzaID} currentQty={currentQty} />
-				<DeleteItem pizzaId={pizzaID} />
+				<UpdateItemQty pizzaId={pizzaId} currentQty={currentQty} />
+				<DeleteItem pizzaId={pizzaId} />
 			</div>
 		</li>
 	);

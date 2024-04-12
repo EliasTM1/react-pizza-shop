@@ -5,15 +5,6 @@ type InitialStateProps = {
 };
 const initialState: InitialStateProps = {
 	cart: [],
-	// cart: [
-	// 	{
-	// 		pizzaID: 12,
-	// 		name: "Mediterranean",
-	// 		quantity: 2,
-	// 		unitPrice: 16,
-	// 		totalPrice: 32,
-	// 	},
-	// ],
 };
 
 const cartSlice = createSlice({
@@ -25,18 +16,18 @@ const cartSlice = createSlice({
 		},
 		deleteItem(state, action) {
 			state.cart = state.cart.filter((item) => {
-				return item.pizzaID !== action.payload
+				return item.pizzaId !== action.payload
 			});
 		},
 		increaseItemQty(state, action) {
-			const item = state.cart.find((item) => item.pizzaID === action.payload);
+			const item = state.cart.find((item) => item.pizzaId === action.payload);
 			if (item.quantity) {
 				item.quantity++;
 				item.totalPrice = item.quantity * item.unitPrice;
 			}
 		},
 		decreaseItemQty(state, action) {
-			const item = state.cart.find((item) => item.pizzaID === action.payload);
+			const item = state.cart.find((item) => item.pizzaId === action.payload);
 			if (item) {
 				item.quantity--;
 				item.totalPrice = item.quantity * item.unitPrice;
@@ -61,7 +52,7 @@ export default cartSlice.reducer;
 
 export const getCart = (state: any) => state.cart.cart;
 
-export const getCurrentQtyById = (id: any) => (state) => state.cart.cart.find((item) =>item.pizzaID === id)?.quantity ?? 0;
+export const getCurrentQtyById = (id: any) => (state) => state.cart.cart.find((item) =>item.pizzaId === id)?.quantity ?? 0;
 
 
 export const getTotalCartQty = (state: any) =>

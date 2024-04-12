@@ -3,9 +3,12 @@
 // import { Form, redirect, useActionData, useNavigation } from "react-router-dom";
 import { Form, redirect, useActionData, useNavigation } from "react-router-dom";
 import { createOrder } from "../../services/apiRestaurant";
+import { clearCart, getCart, getTotalCartPrice } from "../cart/CartSlice";
 import { useSelector } from "react-redux";
-import { getCart } from "../cart/CartSlice";
 import Button from "../../UI/Button";
+import store from "../../store";
+import { formatCurrency } from "../../utils/helpers";
+import { useState } from "react";
 
 // https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str: any) =>
@@ -13,17 +16,17 @@ const isValidPhone = (str: any) =>
 		str
 	);
 
-
-
 function CreateOrder() {
+	const [withPriority, setWithPriority] = useState<boolean>(false);
 	const navigation = useNavigation();
 	const isSubmitting: boolean = navigation.state === "submitting";
 	// * For any data
-	const username =  useSelector((state: any) => state.user.username)
+	const username = useSelector((state: any) => state.user.username);
 	const formErrors: any = useActionData();
-
-	// const [withPriority, setWithPriority] = useState(false);
 	const cart = useSelector(getCart);
+	const totalCartPrice = useSelector(getTotalCartPrice);
+	const primePrice = withPriority ? totalCartPrice * 0.2 : 0;
+	const totalPrice = totalCartPrice + primePrice;
 
 	return (
 		<div className='px-4 py-6'>
@@ -33,7 +36,13 @@ function CreateOrder() {
 			<Form method='POST'>
 				<div className='mb-5 flex flex-col gap-2 sm:flex-row sm:items-center'>
 					<label className='sm:basis-40'>First Name</label>
-					<input className='input grow' type='text' name='customer' required defaultValue={username}/>
+					<input
+						className='input grow'
+						type='text'
+						name='customer'
+						required
+						defaultValue={username}
+					/>
 				</div>
 
 				<div className='mb-5 flex flex-col gap-2 sm:flex-row sm:items-center'>
@@ -66,8 +75,8 @@ function CreateOrder() {
 						type='checkbox'
 						name='priority'
 						id='priority'
-						// value={withPriority}
-						// onChange={(e) => setWithPriority(e.target.checked)}
+						value={withPriority ? 'true' : 'false'}
+						onChange={(e) => setWithPriority(e.target.checked)}
 					/>
 					<label htmlFor='priority' className='font-medium'>
 						Want to yo give your order priority?
@@ -77,13 +86,16 @@ function CreateOrder() {
 				<div>
 					<input type='hidden' name='cart' value={JSON.stringify(cart)} />
 					<Button disabled={isSubmitting} type='primary'>
-						{isSubmitting ? "Placing order...." : "Order now"}
+						{isSubmitting
+							? "Placing order...."
+							: `Pay ${formatCurrency(totalPrice)}`}
 					</Button>
 				</div>
 			</Form>
 		</div>
 	);
 }
+
 //  * Will be called after form submit
 export async function action({ request }: any) {
 	const formData = await request.formData();
@@ -92,19 +104,22 @@ export async function action({ request }: any) {
 	const order: any = {
 		...data,
 		cart: JSON.parse(data.cart),
-		priority: data.priority === "on",
+		priority: data.priority === "true",
 	};
+	console.log(data, "ME ORDER");
 	const errors: any = {};
 	if (!isValidPhone(order.phone)) {
 		errors.phone = "Please, provide a valid US number. ";
 		return errors;
 	}
-	if (Object.keys(errors).length > 1) return errors;
+	if (Object.keys(errors).length > 0) return errors;
 
 	//   * Form was filled correctly
-	console.log( "CALLING")
 	const newOrder = await createOrder(order);
-	console.log(newOrder, "NUEVA ORDERN")
+
+	// * Avoid importing the whole store in order to dispatch
+	// ! DO NOT OVERUSER
+	store.dispatch(clearCart());
 	return redirect(`/order/${newOrder.id}`);
 }
 

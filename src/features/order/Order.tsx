@@ -109,7 +109,8 @@ function  Order() {
 }
 
 export async function laoder({params}) {
-  const order = await getOrder(params.orderId)
+  console.log(params, "ME PARAMETERS")
+  const order = await getOrder(params.orderID)
   return order
 }
 
